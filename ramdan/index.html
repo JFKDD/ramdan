@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رمضان مبارك</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0; height: 100vh; background: #050510;
+            font-family: 'Cairo', sans-serif; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* شاشة المؤقت */
+        #timer-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050510 radial-gradient(circle at center, #1a1a3a 0%, #050510 100%);
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 9999; transition: opacity 1s ease-out;
+        }
+
+        #countdown {
+            color: #d4af37; font-size: 80px; font-weight: bold;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); margin: 0;
+        }
+
+        .wait-msg { color: #f1e4b3; font-size: 20px; margin-top: 20px; opacity: 0.7; }
+
+        /* محتوى الموقع */
+        #main-content {
+            display: none; width: 100%; height: 100%; flex-direction: column;
+            justify-content: center; align-items: center; position: relative;
+            background: #050510 radial-gradient(circle at center, #1a1a3a 0%, #050510 100%);
+        }
+
+        .stars {
+            position: absolute; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.5;
+        }
+
+        /* حاوية الصور الجديدة */
+        .image-container {
+            position: absolute;
+            top: -500px; /* تبدأ من خارج الشاشة للسقوط */
+            z-index: 3;
+            animation: dropImage 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            text-align: center;
+        
+            
+        }
+        .left { left: 8%; animation-delay: 0.5s; }
+        .right { right: 8%; animation-delay: 1s; }
+        @media (max-width:1024px){
+            .left{left:-1%;}
+            .right{right: -1%;}
+            
+        }
+        /* تنسيق الصورة التي ستضيفها */
+        .custom-img {
+            width: 150px; /* يمكنك تغيير الحجم من هنا */
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
+        }
+
+        /* حبل تعليق الصور */
+        .rope {
+            width: 2px; height: 200px;
+            background: linear-gradient(to bottom, transparent, #d4af37);
+            margin: 0 auto;
+        }
+
+        /* القمر والنص */
+        .moon-wrapper { position: relative; width: 300px; height: 300px; z-index: 2; }
+        .moon {
+            position: relative; width: 100%; height: 100%; background: #fffbe6;
+            border-radius: 50%; box-shadow: 0 0 60px rgba(255, 251, 230, 0.3);
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
+        }
+        .shadow {
+            position: absolute; width: 100%; height: 100%; background: #11112d;
+            border-radius: 50%; left: 100%;
+            animation: moonToCrescent 4s ease-in-out forwards;
+        }
+
+        .ramadan-text {
+            position: absolute; color: #d4af37; font-family: 'Amiri', serif;
+            font-size: 3rem; text-align: center; opacity: 0; z-index: 5;
+            animation: fadeIn 2s ease-in forwards; animation-delay: 1.5s;
+            margin-left:30px;
+        }
+
+        .footer-msg {
+            margin-top: 40px; color: #f1e4b3; font-size: 1.8rem; opacity: 0;
+            animation: fadeIn 2s ease-in forwards; animation-delay: 3.5s;
+        }
+
+        @keyframes moonToCrescent { 0% { left: 100%; } 100% { left: 25%; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes dropImage { from { top: -500px; } to { top: 0px; } }
+    </style>
+</head>
+<body>
+
+    <!-- الملف الصوتي -->
+    <audio id="celebration-audio" src="ew1_1.mp3" preload="auto"></audio>
+
+    <div id="timer-screen">
+        <div id="countdown">12:50</div>
+        <div class="wait-msg">لحظات ونحتفل...</div>
+    </div>
+
+    <div id="main-content">
+        <div class="stars"></div>
+
+        <div class="image-container left">
+            <div class="rope"></div>
+            <img src="lat.png" alt="صورة رمضان" class="custom-img">
+        </div>
+
+        <div class="image-container right">
+            <div class="rope"></div>
+            <img src="lat.png" alt="صورة رمضان" class="custom-img">
+        </div>
+
+        <div class="moon-wrapper">
+            <div class="moon">
+                <div class="shadow"></div>
+                <div class="ramadan-text">رمضان<br>مبارك</div>
+            </div>
+        </div>
+        <div class="footer-msg">كل عام وأنتم بخير</div>
+    </div>
+
+    <script>
+        let minutes = 12;
+        let seconds = 50;
+        const countdownEl = document.getElementById('countdown');
+        const timerScreen = document.getElementById('timer-screen');
+        const mainContent = document.getElementById('main-content');
+
+        const timerInterval = setInterval(() => {
+            seconds++;
+            if (seconds === 60) { minutes++; seconds = 0; }
+
+           
+            let m = minutes < 10 ? '0' + minutes : minutes;
+            let s = seconds < 10 ? '0' + seconds : seconds;
+            countdownEl.innerText = `${m}:${s}`;
+           
+            if (minutes === 13 && seconds === 0) {
+                clearInterval(timerInterval);
+                countdownEl.innerText = "00:00";
+                countdownEl.style.color = "#fff";
+
+                setTimeout(() => {
+                    // تشغيل الملف الصوتي فوراً عند بدء الانتقال
+                    const audio = document.getElementById('celebration-audio');
+                    audio.play().catch(function(error) {
+                        console.log("Audio play failed: ", error);
+                    });
+                    
+                    timerScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        timerScreen.style.display = 'none';
+                        mainContent.style.display = 'flex';
+                       
+                    }, 1000);
+                }, 1000);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
